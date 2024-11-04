@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.system_demo.mapper.PaperMapper">
+
+    <select id="findByAuthorId" parameterType="String" resultType="com.example.system_demo.entity.Paper">
+        SELECT p.* FROM paper_1 p JOIN A_P ap ON p.id = ap.paper_id WHERE ap.author_id = #{authorId}
+        UNION ALL
+        SELECT p.* FROM paper_2 p JOIN A_P ap ON p.id = ap.paper_id WHERE ap.author_id = #{authorId}
+        UNION ALL
+        SELECT p.* FROM paper_3 p JOIN A_P ap ON p.id = ap.paper_id WHERE ap.author_id = #{authorId}
+
+    </select>
+
+
+
+
+    <select id="findAuthorsByPaperId" parameterType="String" resultType="com.example.system_demo.entity.Paper">
+        SELECT a.* FROM author a JOIN A_P ap ON a.id = ap.author_id WHERE ap.paper_id = #{paperId}
+    </select>
+
+
+
+
+    <select id="findPapersByName" parameterType="String" resultType="com.example.system_demo.entity.Paper">
+        SELECT *
+        FROM paper_1
+        WHERE MATCH(title) AGAINST(#{name})
+        LIMIT 50
+    </select>
+
+
+
+
+
+    <select id="searchPapersByInterests" resultType="com.example.system_demo.entity.Paper">
+        (SELECT * FROM paper_1
+        WHERE 1=1
+        <if test="interests != null and interests.size() > 0">
+            <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+                <foreach collection="interests" item="interest" separator="OR">
+                    `abstract` LIKE CONCAT('%', #{interest}, '%')
+                </foreach>
+            </trim>
+        </if>)
+
+        UNION ALL
+
+        (SELECT * FROM paper_2
+        WHERE 1=1
+        <if test="interests != null and interests.size() > 0">
+            <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+                <foreach collection="interests" item="interest" separator="OR">
+                    `abstract` LIKE CONCAT('%', #{interest}, '%')
+                </foreach>
+            </trim>
+        </if>)
+
+        UNION ALL
+
+        (SELECT * FROM paper_3
+        WHERE 1=1
+        <if test="interests != null and interests.size() > 0">
+            <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+                <foreach collection="interests" item="interest" separator="OR">
+                    `abstract` LIKE CONCAT('%', #{interest}, '%')
+                </foreach>
+            </trim>
+        </if>)
+
+        UNION ALL
+
+        (SELECT * FROM paper_4
+        WHERE 1=1
+        <if test="interests != null and interests.size() > 0">
+            <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+                <foreach collection="interests" item="interest" separator="OR">
+                    `abstract` LIKE CONCAT('%', #{interest}, '%')
+                </foreach>
+            </trim>
+        </if>)
+
+        UNION ALL
+
+        (SELECT * FROM paper_5
+        WHERE 1=1
+        <if test="interests != null and interests.size() > 0">
+            <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+                <foreach collection="interests" item="interest" separator="OR">
+                    `abstract` LIKE CONCAT('%', #{interest}, '%')
+                </foreach>
+            </trim>
+        </if>)
+
+        UNION ALL
+
+        (SELECT * FROM paper_6
+        WHERE 1=1
+        <if test="interests != null and interests.size() > 0">
+            <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+                <foreach collection="interests" item="interest" separator="OR">
+                    `abstract` LIKE CONCAT('%', #{interest}, '%')
+                </foreach>
+            </trim>
+        </if>)
+
+        UNION ALL
+
+        (SELECT * FROM paper_7
+        WHERE 1=1
+        <if test="interests != null and interests.size() > 0">
+            <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+                <foreach collection="interests" item="interest" separator="OR">
+                    `abstract` LIKE CONCAT('%', #{interest}, '%')
+                </foreach>
+            </trim>
+        </if>)
+
+        LIMIT 20
+    </select>
+
+
+
+
+</mapper>

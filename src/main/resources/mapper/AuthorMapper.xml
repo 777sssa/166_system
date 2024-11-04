@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.system_demo.mapper.AuthorMapper">
+
+    <select id="findAllAuthorProfiles" resultType="com.example.system_demo.vo.AuthorProfileVO">
+        SELECT
+            a.id AS authorId,
+            a.name AS authorName,
+            a.org AS authorOrg,
+            a.normalized_name AS normalizedName,
+            a.last_known_aff_id AS lastKnownAffId,
+            a.position,
+            a.n_pubs AS nPubs,
+            a.n_citation AS nCitation,
+            a.h_index AS hIndex,
+            a.tags,
+            a.pubs,
+            ap.email,
+            ap.phone,
+            ap.gender,
+            ap.picture,
+            ap.homepage,
+            ap.pos,
+            ap.biography,
+            ap.education,
+            ap.interests,
+            ap.org AS profileOrg
+        FROM
+            author a
+                LEFT JOIN author_profile ap ON a.id = ap.id
+            LIMIT 20
+    </select>
+
+
+
+
+    <select id="findAuthorProfileById" parameterType="string" resultType="com.example.system_demo.vo.AuthorProfileVO">
+        SELECT
+            a.id AS authorId,
+            a.name AS authorName,
+            a.org AS authorOrg,
+            a.normalized_name AS normalizedName,
+            a.last_known_aff_id AS lastKnownAffId,
+            a.position,
+            a.n_pubs AS nPubs,
+            a.n_citation AS nCitation,
+            a.h_index AS hIndex,
+            a.tags,
+            a.pubs,
+            ap.email,
+            ap.phone,
+            ap.gender,
+            ap.picture,
+            ap.homepage,
+            ap.pos,
+            ap.biography,
+            ap.education,
+            ap.interests,
+            ap.org AS profileOrg
+        FROM
+            author a
+                LEFT JOIN author_profile ap ON a.id = ap.id
+        WHERE
+            a.id = #{id}
+            LIMIT 1
+    </select>
+
+
+
+    <select id="findAuthorsByName" parameterType="String" resultType="com.example.system_demo.entity.Author">
+
+        SELECT *
+        FROM author
+        WHERE name LIKE CONCAT(#{name}, '%')
+
+    </select>
+
+
+    <!-- 根据作者 id 查询相似作者的 id 列表 -->
+    <select id="findSimilarAuthorsByAuthorId" parameterType="string" resultType="string">
+        <choose>
+            <when test="'53f47977dabfae8a6845b643'.equals(authorId)">
+                SELECT
+                similar_author_id
+                FROM
+                similar_173
+                ORDER BY collaboration_count DESC
+                LIMIT 100
+            </when>
+            <when test="'53f42f36dabfaedce54dcd0c'.equals(authorId)">
+                SELECT
+                similar_author_id
+                FROM
+                similar_han_apa
+                ORDER BY collaboration_count DESC
+                LIMIT 100
+            </when>
+            <otherwise>
+                SELECT
+                similar_author_id
+                FROM
+                similar_authors
+                WHERE
+                author_id = #{authorId}
+                LIMIT 100
+            </otherwise>
+        </choose>
+
+    </select>
+
+    <!-- 根据相似作者的 id 列表查询相似作者的详细信息 -->
+    <select id="findAuthorProfilesByIds" parameterType="list" resultType="com.example.system_demo.vo.AuthorProfileVO">
+        SELECT
+        a.id AS authorId,
+        a.name AS authorName,
+        ap.picture
+        FROM
+        author a
+        LEFT JOIN author_profile ap ON a.id = ap.id
+        WHERE
+        a.id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY FIELD(a.id,
+        <foreach collection="list" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+
+
+    <!-- 根据作者 id 查询推荐作者的 id 列表 -->
+    <select id="findRecommendAuthorsByAuthorId" parameterType="string" resultType="string">
+        <choose>
+            <!-- 如果 authorId 是 '53f47977dabfae8a6845b643' -->
+            <when test="'53f47977dabfae8a6845b643'.equals(authorId)">
+                SELECT similar_author_id
+                FROM similar_phi_appa
+                UNION
+                SELECT similar_author_id
+                FROM similar_p_apvpa
+                LIMIT 100
+            </when>
+
+            <!-- 如果 authorId 是 '53f42f36dabfaedce54dcd0c' -->
+            <when test="'53f42f36dabfaedce54dcd0c'.equals(authorId)">
+                SELECT similar_author_id
+                FROM similar_h_appa
+                LIMIT 100
+            </when>
+
+            <!-- 否则，随机从 similar_authors 中获取 100 个 id -->
+            <otherwise>
+                SELECT similar_author_id
+                FROM similar_authors
+                WHERE author_id = #{authorId}
+                ORDER BY RAND()
+                LIMIT 100
+            </otherwise>
+        </choose>
+
+
+    </select>
+
+
+</mapper>
